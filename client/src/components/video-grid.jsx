@@ -1,8 +1,9 @@
-import { useState } from "react"
-import VideoTile from "./video-title"
+import { useRef, useEffect, useState } from "react";
+import VideoTile from "./video-title";
 
-export default function VideoGrid({ isPlaying, syncKey }) {
-  const [fullscreenId, setFullscreenId] = useState(null)
+export default function VideoGrid({ isPlaying }) {
+  const [fullscreenId, setFullscreenId] = useState(null);
+  const videoRefs = useRef({});
 
   const cameras = [
     { id: 1, label: "Camera 1", location: "Entrance" },
@@ -11,21 +12,46 @@ export default function VideoGrid({ isPlaying, syncKey }) {
     { id: 4, label: "Camera 4", location: "Hallway B" },
     { id: 5, label: "Camera 5", location: "Storage" },
     { id: 6, label: "Camera 6", location: "Exit" },
-  ]
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const master = videoRefs.current[1];
+      if (!master || master.readyState < 2) return;
+
+      const masterTime = master.currentTime;
+
+      for (let i = 2; i <= 6; i++) {
+        const slave = videoRefs.current[i];
+        if (!slave || slave.readyState < 2) continue;
+
+        const drift = Math.abs(slave.currentTime - masterTime);
+
+        if (drift > 0.25) {
+          slave.currentTime = masterTime;
+        }
+      }
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {cameras.map((camera) => (
+      {cameras.map((cam) => (
         <VideoTile
-          key={camera.id}
-          id={camera.id}
-          label={camera.label}
-          location={camera.location}
+          key={cam.id}
+          id={cam.id}
+          label={cam.label}
+          location={cam.location}
           isPlaying={isPlaying}
-          isFullscreen={fullscreenId === camera.id}
-          onFullscreenChange={(id) => setFullscreenId(fullscreenId === id ? null : id)}
+          isFullscreen={fullscreenId === cam.id}
+          onFullscreenChange={(id) =>
+            setFullscreenId(fullscreenId === id ? null : id)
+          }
+          ref={(el) => (videoRefs.current[cam.id] = el)}
         />
       ))}
     </div>
-  )
+  );
 }
