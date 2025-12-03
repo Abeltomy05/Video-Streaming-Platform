@@ -17,7 +17,7 @@ export default function VideoGrid({ isPlaying, syncKey }) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {cameras.map((camera) => (
         <VideoTile
-          key={`${camera.id}-${syncKey}`}
+          key={camera.id}
           id={camera.id}
           label={camera.label}
           location={camera.location}
