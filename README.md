@@ -145,3 +145,10 @@ Start the MediaMTX server using your configuration file:
 - pulls the RTSP feed
 - generates 6 HLS pipelines
 - exposes 6 public .m3u8 URLs
+
+## Environment Variables
+
+Create a `.env` file:
+```bash
+VITE_HLS_BASE_URL=http://localhost:8888
+```
