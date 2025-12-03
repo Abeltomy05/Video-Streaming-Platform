@@ -1,6 +1,6 @@
-import { Play, Pause, RefreshCw } from "lucide-react"
+import { Play, Pause } from "lucide-react"
 
-export default function SyncControls({ onPlayAll, onPauseAll, onReSyncStreams, isPlaying }) {
+export default function SyncControls({ onPlayAll, onPauseAll, isPlaying }) {
   return (
     <div className="bg-slate-800/40 border border-slate-700 rounded-xl p-4 flex flex-wrap gap-3 items-center justify-between backdrop-blur-sm">
       <div className="flex gap-3 flex-wrap">
@@ -26,14 +26,6 @@ export default function SyncControls({ onPlayAll, onPauseAll, onReSyncStreams, i
         >
           <Pause className="w-4 h-4" />
           Pause All
-        </button>
-
-        <button
-          onClick={onReSyncStreams}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium bg-slate-700 border border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Re-Sync Streams
         </button>
       </div>
 
