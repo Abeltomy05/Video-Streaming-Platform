@@ -1,58 +1,58 @@
-import { useEffect, useRef } from "react"
-import Hls from "hls.js"
+import { forwardRef, useEffect, useRef, useImperativeHandle } from "react";
+import Hls from "hls.js";
 
-export default function HLSPlayer({ src, isPlaying, onError, onLoaded }) {
-  const videoRef = useRef(null)
+const HLSPlayer = forwardRef(({ src, isPlaying, onError, onLoaded }, ref) => {
+  const videoRef = useRef(null);
 
-  // Load HLS
+  useImperativeHandle(ref, () => videoRef.current);
+
   useEffect(() => {
-    const video = videoRef.current
-    let hls
+    const video = videoRef.current;
+    let hls;
 
-    if (!video) return
+    if (!video) return;
 
     if (Hls.isSupported()) {
-      hls = new Hls()
+      hls = new Hls();
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) onError?.(data)
-      })
+        console.log("HLS error:", data);
+        if (data.fatal) onError?.(data);
+      });
 
-      hls.loadSource(src)
-      hls.attachMedia(video)
+      hls.loadSource(src);
+      hls.attachMedia(video);
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src
+      video.src = src;
     }
 
-    return () => hls?.destroy()
-  }, [src])
+    const handleCanPlay = () => onLoaded?.();
+    video.addEventListener("canplay", handleCanPlay);
 
-  // Play/pause sync
+    return () => {
+      video.removeEventListener("canplay", handleCanPlay);
+      if (hls) hls.destroy();
+    };
+  }, [src]);
+
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
+    const video = videoRef.current;
+    if (!video) return;
 
-    isPlaying ? video.play().catch(() => {}) : video.pause()
-  }, [isPlaying])
-
-  // Detect when stream is actually ready
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const handleCanPlay = () => onLoaded?.()
-
-    video.addEventListener("canplay", handleCanPlay)
-    return () => video.removeEventListener("canplay", handleCanPlay)
-  }, [])
+    if (isPlaying) video.play().catch(() => {});
+    else video.pause();
+  }, [isPlaying]);
 
   return (
     <video
       ref={videoRef}
       className="w-full h-full object-cover"
-      autoPlay
       muted
       playsInline
+      controls={false}
+      autoPlay
     />
-  )
-}
+  );
+});
+
+export default HLSPlayer;
