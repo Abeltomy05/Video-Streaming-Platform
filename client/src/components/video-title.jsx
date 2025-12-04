@@ -17,8 +17,7 @@ const VideoTile = forwardRef(
       setHasError(false);
     };
 
-    const baseUrl = import.meta.env.VITE_HLS_BASE_URL;
-    const hlsUrl = `${baseUrl}/cam${id}/index.m3u8`;
+    const hlsUrl = `/api/stream/cam${id}/index.m3u8`;
 
     return (
       <div
